@@ -179,7 +179,7 @@ void TextAdjuster::setHandler(Handler handler)
     m_Handler = handler;
 }
 
-void TextAdjuster::adjust(std::string&& word) const
+void TextAdjuster::adjust(const std::string& word) const
 {
     if (!m_Handler)
     {

@@ -96,7 +96,7 @@ void TextGenerator::init(int argc, char** argv)
     }
     
     // Все, что без ключа, считается начальным словом.
-    for (int i = optind; i < argc; ++i)
+    for (register int i = optind; i < argc; ++i)
     {
         m_InitialWords.push_back(argv[i]);
     }
@@ -146,7 +146,7 @@ bool TextGenerator::generateText()
     // Попытаться сгенерировать требуемое число слов.
     try
     {
-        for (int i = 1; i <= m_NumberOfNewWords; ++i)
+        for (register int i = 1; i <= m_NumberOfNewWords; ++i)
         {
             MarkovTextChain::Word newWord = chain.generateWord(m_InitialWords);
             std::cout << newWord << (i % wordsPerLine == 0 ? '\n' : ' ');

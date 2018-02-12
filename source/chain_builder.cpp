@@ -97,7 +97,7 @@ void ChainBuilder::init(int argc, char** argv)
     }
     
     // Все, что без ключа, считается адресом.
-    for (int i = optind; i < argc; ++i)
+    for (register int i = optind; i < argc; ++i)
     {
         m_Urls.push_back(argv[i]);
     }

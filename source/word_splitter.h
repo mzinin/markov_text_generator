@@ -13,7 +13,7 @@ class WordSplitter
 {
 public:
     /// @brief Тип обработчика выделенных слов.
-    using Handler = std::function<void(std::string&&)>;
+    using Handler = std::function<void(const std::string&)>;
     
 public:
     /// @brief Конструктор.

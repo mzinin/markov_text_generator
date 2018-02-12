@@ -26,9 +26,9 @@ public:
     void setHandler(Handler handler);
     
     /// @brief Привести слово к нормальному виду.
-    /// @param[in,out] word - Исходное слово.
+    /// @param[in] word - Исходное слово.
     /// @throws std::exception в случае ошибки.
-    void adjust(std::string&& word) const;
+    void adjust(const std::string& word) const;
     
 private:
     /// @brief Обработать однобайтовый символ UTF-8.

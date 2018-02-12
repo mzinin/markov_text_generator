@@ -99,7 +99,7 @@ namespace
     const std::string wordSplitterOutput = "word_splitter_output.txt";
     const std::string wordSplitterModel = "word_splitter_model.txt";
     
-    void WordSplitterHandler(std::ostream& out, std::string&& word)
+    void WordSplitterHandler(std::ostream& out, const std::string& word)
     {
         out << word << std::endl;
     }

@@ -4,6 +4,7 @@
 #include <ctime>
 #include <sstream>
 #include <unordered_map>
+#include <vector>
 
 
 namespace
@@ -54,7 +55,7 @@ namespace
         const MarkovTextChain::Word& getWord() const
         {
             auto it = m_Words.begin();
-            for (int i = rand() % m_TotalWords; i > 0; --i)
+            for (register int i = rand() % m_TotalWords; i > 0; --i)
             {
                 ++it;
             }
@@ -65,7 +66,7 @@ namespace
         /// @return Строка.
         std::string toString() const
         {
-            std::string result;
+            std::string result = std::to_string(m_TotalWords) + ' ';
             for (const auto& word : m_Words)
             {
                 result += word + ' ';
@@ -103,7 +104,7 @@ namespace
             for (const auto& word : words)
             {
                 const size_t size = word.size();
-                for (size_t i = 0; i < size; ++i)
+                for (register size_t i = 0; i < size; ++i)
                 {
                     hash ^= (hash << 5) + (hash >> 2) + word[i];
                 }
@@ -113,7 +114,6 @@ namespace
             return hash;
         }
     };
-    
 }
 
 
@@ -188,21 +188,7 @@ void MarkovTextChain::load(std::istream& input)
         // После оператора ввода getline вернет ненужную пустую строку.
         std::getline(input, buffer);
         
-        // Читать и разбирать состояния цепи.
-        while (input.good())
-        {
-            std::getline(input, buffer);
-            if (buffer == m_ChainTrailer)
-            {
-                break;
-            }
-            parseChainString(buffer);
-        }
-        
-        if (buffer != m_ChainTrailer)
-        {
-            throw std::runtime_error("MarkovTextChain::load error: input stream is not good");
-        }
+        parseChainStates(input);
     }
     catch (const std::exception&)
     {
@@ -275,47 +261,57 @@ void MarkovTextChain::flush()
     m_CurrentWords.clear();
 }
 
-void MarkovTextChain::parseChainString(const std::string& string)
+void MarkovTextChain::parseChainStates(std::istream& input)
 {
-    std::istringstream buffer(string);
-    
+    std::string tmp;
     Words key;
-    // До разделителя считать слова ключа таблицы состояний.
-    while (!buffer.eof())
+    int totalWords = 0;
+    
+    while (!input.eof())
     {
-        std::string tmp;
-        buffer >> tmp;
-        if (tmp == m_Delimiter)
+        // До разделителя считать слова ключа таблицы состояний.
+        while (!input.eof())
         {
-            break;
+            input >> tmp;
+            if (tmp == m_Delimiter)
+            {
+                break;
+            }
+            if (tmp == m_ChainTrailer)
+            {
+                return;
+            }
+            if (!tmp.empty())
+            {
+                key.push_back(std::move(tmp));
+            }
         }
-        if (!tmp.empty())
+        
+        if (key.size() != m_Order)
         {
-            key.push_back(std::move(tmp));
+            throw std::logic_error("MarkovTextChain::parseChainString error: chain string has wrong order");
+        }
+        
+        WordsKeeper& value = m_Chain->m_Map[std::move(key)];
+        
+        input >> totalWords;
+        // После разделителя считать слова значения таблицы состояний.
+        while (!input.eof() && --totalWords >= 0)
+        {
+            input >> tmp;
+            if (!tmp.empty())
+            {
+                value.addWord(std::move(tmp));
+            }
+        }
+        
+        if (value.empty())
+        {
+            throw std::logic_error("MarkovTextChain::parseChainString error: chain string has no value");
         }
     }
     
-    if (key.size() != m_Order)
-    {
-        throw std::logic_error("MarkovTextChain::parseChainString error: chain string has wrong order");
-    }
-    
-    WordsKeeper& value = m_Chain->m_Map[std::move(key)];
-    // После разделителя считать слова значения таблицы состояний.
-    while (!buffer.eof())
-    {
-        std::string tmp;
-        buffer >> tmp;
-        if (!tmp.empty())
-        {
-            value.addWord(std::move(tmp));
-        }
-    }
-    
-    if (value.empty())
-    {
-        throw std::logic_error("MarkovTextChain::parseChainString error: chain string has no value");
-    }
+    throw std::runtime_error("MarkovTextChain::load error: input stream is not good");
 }
 
 void MarkovTextChain::reset()

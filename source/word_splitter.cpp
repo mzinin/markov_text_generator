@@ -29,7 +29,7 @@ void WordSplitter::addText(const char* text, size_t size)
     m_Buffer.write(text, size);
     
     // Выделить все слова и передать их дальше.
-    for (unsigned i = 0; i < newWords; ++i)
+    for (register unsigned i = 0; i < newWords; ++i)
     {
         std::string word;
         m_Buffer >> word;

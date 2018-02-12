@@ -62,10 +62,10 @@ public:
     void flush();
     
 private:
-    /// @brief Разобрать строку, описывающую состояние цепи Маркова.
-    /// @param[in] string - Входная строка.
+    /// @brief Разобрать из потока состояния цепи Маркова.
+    /// @param[in] input - Поток ввода.
     /// @throws std::exception в случае ошибки.
-    void parseChainString(const std::string& string);
+    void parseChainStates(std::istream& input);
     
     /// @brief Сбросить состояние цепи.
     void reset();
